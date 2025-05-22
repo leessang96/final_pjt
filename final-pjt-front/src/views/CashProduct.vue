@@ -10,7 +10,7 @@
         </div>
         <canvas id="goldChart"></canvas>
 
-        <!-- <div>
+        <div>
         <h2>은 시세</h2>
         <div>
             <button @click="loadChart('1d')">1일</button>
@@ -18,8 +18,8 @@
             <button @click="loadChart('1mo')">1개월</button>
             <button @click="loadChart('1y')">1년</button>
         </div>
-        <canvas id="sliverChart"></canvas>
-        </div> -->
+        <canvas id="silverChart"></canvas>
+        </div>
       </div>
 </template>
 
@@ -31,28 +31,44 @@
 
 import { onMounted, ref } from 'vue'
 import Chart from 'chart.js/auto'
+import { nextTick } from 'vue' // 추가 부분 
 
 let chart = null
 const CurrentPrice = ref(null)
 
-const loadChart = async (period = '1mo') => {
-  const res = await fetch(`http://localhost:8000/api/raw-products/gold-price/?period=${period}`)
+const charts = {}               // 차트 인스턴스 저장용
+const currentPrices = ref({})  // 금, 은 가격 저장용
+
+const loadChart = async (type, period = '1mo') => {
+  const res = await fetch(`http://localhost:8000/api/raw-products/${type}-price/?period=${period}`)
+  if (!res.ok) {
+    console.error(`${type} 데이터 요청 실패`)
+    return
+  }
   const data = await res.json()
 
   const labels = data.prices.map(p => p.date)
   const prices = data.prices.map(p => p.price)
 
-  CurrentPrice.value = prices[prices.length - 1] // 가장 최신 가격 
+  currentPrices.value[type] = prices[prices.length - 1]
 
-  if (chart) chart.destroy()
+  // 기존 차트 제거
+  if (charts[type]) charts[type].destroy()
 
-  const ctx = document.getElementById('goldChart')
-  chart = new Chart(ctx, {
+  await nextTick()  // canvas 렌더링 보장
+
+  const ctx = document.getElementById(`${type}Chart`)
+  if (!ctx) {
+    console.warn(`${type}Chart 캔버스 찾을 수 없음`)
+    return
+  }
+
+  charts[type] = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: labels,
+      labels,
       datasets: [{
-        label: `Gold Price (${period})`,
+        label: `${type.toUpperCase()} Price (${period})`,
         data: prices,
         borderWidth: 2,
         tension: 0.3,
@@ -62,7 +78,8 @@ const loadChart = async (period = '1mo') => {
 }
 
 onMounted(() => {
-  loadChart('1mo')
+  loadChart('gold', '1mo')
+  loadChart('silver', '1mo')
 })
 </script>
 

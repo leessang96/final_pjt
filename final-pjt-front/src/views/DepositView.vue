@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>금융상품 비교</h2>
+    <h2>정기예금상품 비교</h2>
     <ul>
       <li v-for="product in products" :key="product.fin_prdt_cd">
         {{ product.kor_co_nm }} - {{ product.fin_prdt_nm }}
