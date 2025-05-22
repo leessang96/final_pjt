@@ -15,7 +15,19 @@ def term_deposits(request): # 정기 예금
     res = requests.get(base_url, params=params)
     data = res.json()
 
+    # total_data += data
+
     return JsonResponse(data)
 
 def saving_deposits(request):   # 적금   
-    pass
+    base_url = "https://finlife.fss.or.kr/finlifeapi/savingProductsSearch.json"
+    params = {
+        "auth": settings.API_KEY,
+        "topFinGrpNo": "020000",
+        "pageNo": 1
+    }
+
+    res = requests.get(base_url, params=params)
+    data = res.json()
+
+    return JsonResponse(data)

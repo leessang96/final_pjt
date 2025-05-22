@@ -16,9 +16,9 @@ Including another URLconf
 """
 
 from django.urls import path
-from .views import gold_price
+from .views import gold_price, silver_price
 
 urlpatterns = [
     path('gold-price/', gold_price),
-    # path('sliver-price/', sliver_price),
+    path('silver-price/', silver_price),
 ]

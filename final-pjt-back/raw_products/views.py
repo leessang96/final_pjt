@@ -16,7 +16,7 @@ def gold_price(request):
 
     return JsonResponse({"prices": prices})
 
-def sliver_price(request):
+def silver_price(request):
     period = request.GET.get('period', '1mo')  # 기본값: 1개월
     sliver = yf.Ticker("SI=F")
     hist = sliver.history(period=period)
