@@ -34,6 +34,8 @@ INSTALLED_APPS = [
     'accounts',
     'articles',
     'fin_products',
+    'raw_product',
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,10 +49,21 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# ----------------추가 된 부분-----------------#
+CORS_ALLOW_ALL_ORIGINS = True
+
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+API_KEY = os.getenv('API_KEY')
+# ------------------------------------------#
 
 ROOT_URLCONF = 'finpjt.urls'
 
