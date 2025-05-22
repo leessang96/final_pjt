@@ -21,6 +21,9 @@
           <li class="nav-item">
             <RouterLink :to="{ name: 'articles'}" class="nav-link">게시판</RouterLink>
           </li>
+          <li class="nav-item">
+            <RouterLink :to="{ name: 'logIn'}" class="nav-link">로그인</RouterLink>
+          </li>
         </ul>
       </div>
     </div>

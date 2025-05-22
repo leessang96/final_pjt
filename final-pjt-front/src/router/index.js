@@ -3,6 +3,7 @@ import DepositView from '@/views/DepositView.vue'
 import CashProduct from '@/views/CashProduct.vue'
 import BankMap from '@/views/BankMap.vue'
 import ArticlesList from '@/views/ArticlesList.vue'
+import LogInView from '@/views/LogInView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,6 +27,11 @@ const router = createRouter({
       path: '/articles',
       name: 'articles',
       component: ArticlesList,
+    },
+    {
+      path: '/logIn',
+      name: 'logIn',
+      component: LogInView,
     },
   ],
 })
