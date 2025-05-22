@@ -34,7 +34,7 @@ INSTALLED_APPS = [
     'accounts',
     'articles',
     'fin_products',
-    'raw_product',
+    'raw_products',
     'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -137,3 +137,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'accounts.User'
