@@ -1,30 +1,46 @@
 from django.shortcuts import render
 
-import yfinance as yf
 from django.http import JsonResponse
+import yfinance as yf
+from datetime import datetime, timedelta
 
+
+# 공통 로직
+def fetch_price_data(ticker, start=None, end=None, period='1mo'):
+    if end:
+        try:
+            end_dt = datetime.strptime(end, '%Y-%m-%d') + timedelta(days=1)
+            end = end_dt.strftime('%Y-%m-%d')
+        except ValueError:
+            pass
+    
+    yf_ticker = yf.Ticker(ticker)
+    if start and end:
+        hist = yf_ticker.history(start=start, end=end)
+    else:
+        hist = yf_ticker.history(period=period)
+
+    prices = [
+        {"date": str(date.date()), "price": round(row["Close"], 2)}
+        for date, row in hist.iterrows()
+    ]
+
+    return {"prices": prices}
+
+
+# 금 가격
 def gold_price(request):
-    period = request.GET.get('period', '1mo')  # 기본값: 1개월
-    gold = yf.Ticker("GC=F")
-    hist = gold.history(period=period)
+    start = request.GET.get('start')
+    end = request.GET.get('end')
+    period = request.GET.get('period', '1mo')
+    data = fetch_price_data("GC=F", start, end, period)
+    return JsonResponse(data)
 
-    # 날짜와 가격 리스트로 반환
-    prices = [
-        {"date": str(date.date()), "price": round(row["Close"], 2)}
-        for date, row in hist.iterrows()
-    ]
 
-    return JsonResponse({"prices": prices})
-
+# 은 가격
 def silver_price(request):
-    period = request.GET.get('period', '1mo')  # 기본값: 1개월
-    sliver = yf.Ticker("SI=F")
-    hist = sliver.history(period=period)
-
-    # 날짜와 가격 리스트로 반환
-    prices = [
-        {"date": str(date.date()), "price": round(row["Close"], 2)}
-        for date, row in hist.iterrows()
-    ]
-
-    return JsonResponse({"prices": prices})
+    start = request.GET.get('start')
+    end = request.GET.get('end')
+    period = request.GET.get('period', '1mo')
+    data = fetch_price_data("SI=F", start, end, period)
+    return JsonResponse(data)
