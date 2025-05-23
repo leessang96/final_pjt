@@ -55,7 +55,7 @@ export const useCashProductStore = defineStore('cashproduct', {
   }),
 
   actions: {
-    // 📌 preset 버튼용 날짜 설정 (자동 평일 조정 포함)
+    // preset 버튼용 날짜 설정 (자동 평일 조정 포함)
     setDateRange(days) {
       const today = new Date()
       const end = new Date(today)

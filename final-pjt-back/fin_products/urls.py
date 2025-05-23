@@ -20,5 +20,5 @@ from .views import term_deposits, saving_deposits
 
 urlpatterns = [
     path('term_deposits/', term_deposits),
-    # path('saving_deposits/', saving_deposits),
+    path('saving_deposits/', saving_deposits),
 ]

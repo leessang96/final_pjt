@@ -68,7 +68,7 @@ const loadChart = async (type) => {
     data: {
       labels,
       datasets: [{
-        label: `${type.toUpperCase()} Price`,
+        // label: `${type.toUpperCase()} Price`,
         data: prices,
         borderWidth: 2,
         tension: 0.3
