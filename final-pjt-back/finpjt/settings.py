@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'accounts',
     'articles',
     'fin_products',
+    'raw_products',
     'rest_framework',
     'rest_framework.authtoken',
     'dj_rest_auth',
@@ -45,6 +46,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'dj_rest_auth.registration',
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -72,6 +74,7 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -82,6 +85,16 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:5173',
     'http://localhost:5173',
 ]
+
+# ----------------추가 된 부분-----------------#
+CORS_ALLOW_ALL_ORIGINS = True # 수정해야할 것
+
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+API_KEY = os.getenv('API_KEY')
+# ------------------------------------------#
 
 ROOT_URLCONF = 'finpjt.urls'
 
