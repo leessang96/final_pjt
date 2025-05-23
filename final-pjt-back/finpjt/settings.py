@@ -56,7 +56,7 @@ MIDDLEWARE = [
 ]
 
 # ----------------추가 된 부분-----------------#
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = True # 수정해야할 것
 
 from dotenv import load_dotenv
 import os

@@ -10,23 +10,23 @@
   <!-- 아래는 전환 버튼 눌렀을 때 나올 차트 -->
   <div v-if="selectedAsset === 'gold'">
     <h2>금 시세 (${{ currentPrices.gold || "-" }})</h2>
-    <div>
+    <!-- <div>
       <button @click="loadChart('1d')">3일</button>
       <button @click="loadChart('5d')">7일</button>
       <button @click="loadChart('1mo')">1개월</button>
       <button @click="loadChart('1y')">1년</button>
-    </div>
+    </div> -->
     <canvas id="goldChart"></canvas>
   </div>
 
   <div v-if="selectedAsset === 'silver'">
     <h2>은 시세 (${{ currentPrices.silver || "-" }})</h2>
-    <div>
+    <!-- <div>
       <button @click="loadChart('1d')">3일</button>
       <button @click="loadChart('5d')">7일</button>
       <button @click="loadChart('1mo')">1개월</button>
       <button @click="loadChart('1y')">1년</button>
-    </div>
+    </div> -->
     <canvas id="silverChart"></canvas>
   </div>
 
