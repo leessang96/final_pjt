@@ -30,6 +30,7 @@
     })
       .then((res) => {
         article.value = res.data
+        console.log(article.value)
       })
       .catch(err => console.log(err))
 
