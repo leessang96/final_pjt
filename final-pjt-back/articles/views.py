@@ -32,7 +32,7 @@ def article_list(request):
 @api_view(['GET'])
 def article_detail(request, article_pk):
     article = get_object_or_404(Article, pk=article_pk)
-
+    print('ㅈ댓다;;')
     if request.method == 'GET':
         serializer = ArticleSerializer(article)
         return Response(serializer.data)
