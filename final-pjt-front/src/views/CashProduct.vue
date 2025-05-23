@@ -1,11 +1,13 @@
 <template>
   <h1>현물 상품</h1>
 
+  <!-- 전환 버튼 -->
   <div>
     <button @click="selectedAsset = 'gold'">금 가격</button>
     <button @click="selectedAsset = 'silver'">은 가격</button>
   </div>
 
+  <!-- 아래는 전환 버튼 눌렀을 때 나올 차트 -->
   <div v-if="selectedAsset === 'gold'">
     <h2>금 시세 (${{ currentPrices.gold || "-" }})</h2>
     <div>
@@ -80,6 +82,7 @@ const loadChart = async (type, period = "1mo") => {
   })
 }
 
+// 값이 바뀌면 차트 전환되도록
 watch(
   selectedAsset,
   (newAsset) => {
