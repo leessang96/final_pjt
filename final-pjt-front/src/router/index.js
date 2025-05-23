@@ -3,9 +3,12 @@ import MainView from '@/views/MainView.vue'
 import DepositView from '@/views/DepositView.vue'
 import CashProduct from '@/views/CashProduct.vue'
 import BankMap from '@/views/BankMap.vue'
-import ArticlesList from '@/views/ArticlesList.vue'
+import ArticlesView from '@/views/ArticlesView.vue'
 import LogInView from '@/views/LogInView.vue'
 import SignUpView from '@/views/SignUpView.vue'
+import ArticleCreateView from '@/views/ArticleCreateView.vue'
+import ArticleDetailView from '@/views/ArticleDetailView.vue'
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -33,7 +36,17 @@ const router = createRouter({
     {
       path: '/articles',
       name: 'articles',
-      component: ArticlesList,
+      component: ArticlesView,
+    },
+    {
+      path: '/articleCreate',
+      name: 'articleCreate',
+      component: ArticleCreateView,
+    },
+    {
+      path: '/articles/:id',
+      name: 'articleDetailView',
+      component: ArticleDetailView,
     },
     {
       path: '/logIn',

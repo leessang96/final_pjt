@@ -21,8 +21,12 @@
           <li class="nav-item">
             <RouterLink :to="{ name: 'articles'}" class="nav-link">게시판</RouterLink>
           </li>
-          <li class="nav-item">
+          <li class="nav-item" v-if="!accountStore.isLogIn">
             <RouterLink :to="{ name: 'logIn'}" class="nav-link">로그인</RouterLink>
+          </li>
+          <li class="nav-item d-flex align-items-center" v-else>
+            <span class="nav-link">안녕하세요, {{ accountStore.username }}님</span>
+            <button class="btn btn-link nav-link" @click="handleLogOut">로그아웃</button>
           </li>
         </ul>
       </div>
@@ -37,7 +41,18 @@
 </template>
 
 <script setup>
-  import { RouterLink, RouterView } from 'vue-router'
+  import { RouterLink, RouterView, useRouter } from 'vue-router'
+  import { ref, computed, onMounted } from 'vue'
+  import { useAccountStore } from '@/stores/accounts.js'
+
+  const accountStore = useAccountStore()
+  const router = useRouter()
+
+  const handleLogOut = () => {
+    accountStore.logOut()
+    router.push({name: 'home'})
+  }
+
 </script>
 
 <style scoped>
