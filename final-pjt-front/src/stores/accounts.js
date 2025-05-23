@@ -15,7 +15,7 @@ export const useAccountStore = defineStore('account', () => {
       }
     })
       .then(res => {
-        token.value = res.data.key    
+        token.value = res.data.key
       })
       .catch(err => console.log(err))
   }
