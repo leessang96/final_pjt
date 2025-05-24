@@ -44,3 +44,27 @@ def silver_price(request):
     period = request.GET.get('period', '1mo')
     data = fetch_price_data("SI=F", start, end, period)
     return JsonResponse(data)
+
+# 구리 가격
+def copper_price(request):
+    start = request.GET.get('start')
+    end = request.GET.get('end')
+    period = request.GET.get('period', '1mo')
+    data = fetch_price_data("HG=F", start, end, period)
+    return JsonResponse(data)
+
+# 원유 가격
+def oil_price(request):
+    start = request.GET.get('start')
+    end = request.GET.get('end')
+    period = request.GET.get('period', '1mo')
+    data = fetch_price_data("CL=F", start, end, period)
+    return JsonResponse(data)
+
+# 천연가스 가격
+def gas_price(request):
+    start = request.GET.get('start')
+    end = request.GET.get('end')
+    period = request.GET.get('period', '1mo')
+    data = fetch_price_data("NG=F", start, end, period)
+    return JsonResponse(data)

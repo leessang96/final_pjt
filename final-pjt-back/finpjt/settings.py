@@ -88,7 +88,7 @@ CORS_ALLOWED_ORIGINS = [
 # ----------------추가 된 부분-----------------#
 CORS_ALLOW_ALL_ORIGINS = True # 수정해야할 것
 
-from dotenv import load_dotenv
+from dotenv import load_dotenv  # pip install 되어있지 않으면 안됨
 import os
 
 load_dotenv()

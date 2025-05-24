@@ -5,6 +5,9 @@
   <div>
     <button @click="selectedAsset = 'gold'">금 가격</button>
     <button @click="selectedAsset = 'silver'">은 가격</button>
+    <button @click="selectedAsset = 'copper'">구리 가격</button>
+    <button @click="selectedAsset = 'oil'">원유 가격</button>
+    <button @click="selectedAsset = 'gas'">천연가스 가격</button>
   </div>
 
   <!-- 금 -->
@@ -40,6 +43,53 @@
 
     <canvas id="silverChart"></canvas>
   </div>
+  <div v-if="selectedAsset === 'copper'">
+    <h2>구리 시세 (${{ cashproduct.currentPrice.copper || "-" }})</h2>
+
+    <div>
+      <label>시작일
+        <input type="date" v-model="cashproduct.startDate">
+      </label>
+      <label>종료일
+        <input type="date" v-model="cashproduct.endDate">
+      </label>
+      <button @click="loadCustomDateChart('copper')">조회</button>
+    </div>
+
+    <canvas id="copperChart"></canvas>
+  </div>
+
+  <div v-if="selectedAsset === 'oil'">
+    <h2>원유 시세 (${{ cashproduct.currentPrice.oil || "-" }})</h2>
+
+    <div>
+      <label>시작일
+        <input type="date" v-model="cashproduct.startDate">
+      </label>
+      <label>종료일
+        <input type="date" v-model="cashproduct.endDate">
+      </label>
+      <button @click="loadCustomDateChart('oil')">조회</button>
+    </div>
+
+    <canvas id="oilChart"></canvas>
+  </div>
+
+  <div v-if="selectedAsset === 'gas'">
+    <h2>천연가스 시세 (${{ cashproduct.currentPrice.gas || "-" }})</h2>
+
+    <div>
+      <label>시작일
+        <input type="date" v-model="cashproduct.startDate">
+      </label>
+      <label>종료일
+        <input type="date" v-model="cashproduct.endDate">
+      </label>
+      <button @click="loadCustomDateChart('gas')">조회</button>
+    </div>
+
+    <canvas id="gasChart"></canvas>
+  </div>
 </template>
 
 <script setup>
@@ -68,7 +118,7 @@ const loadChart = async (type) => {
     data: {
       labels,
       datasets: [{
-        // label: `${type.toUpperCase()} Price`,
+        label: `${type.toUpperCase()} Price`,
         data: prices,
         borderWidth: 2,
         tension: 0.3
