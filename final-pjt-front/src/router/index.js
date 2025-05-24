@@ -8,6 +8,7 @@ import LogInView from '@/views/LogInView.vue'
 import SignUpView from '@/views/SignUpView.vue'
 import ArticleCreateView from '@/views/ArticleCreateView.vue'
 import ArticleDetailView from '@/views/ArticleDetailView.vue'
+import ArticleUpdateView from '@/views/ArticleUpdateView.vue'
 
 
 const router = createRouter({
@@ -47,6 +48,11 @@ const router = createRouter({
       path: '/articles/:id',
       name: 'articleDetailView',
       component: ArticleDetailView,
+    },
+    {
+      path: '/articleUpdate/:id',
+      name: 'articleUpdateView',
+      component: ArticleUpdateView,
     },
     {
       path: '/logIn',
