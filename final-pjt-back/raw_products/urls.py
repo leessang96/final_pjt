@@ -16,9 +16,12 @@ Including another URLconf
 """
 
 from django.urls import path
-from .views import gold_price, silver_price
+from .views import gold_price, silver_price, copper_price, oil_price, gas_price
 
 urlpatterns = [
     path('gold-price/', gold_price),
     path('silver-price/', silver_price),
+    path('copper-price/', copper_price),
+    path('oil-price/', oil_price),
+    path('gas-price/', gas_price),
 ]
