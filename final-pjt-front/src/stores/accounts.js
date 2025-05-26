@@ -11,6 +11,8 @@ export const useAccountStore = defineStore('account', () => {
 
   const isLogIn = computed(() => !!token.value)
 
+  const userInfo = ref(null)  
+
   const logIn = ({username: inputUsername, password}) => {
     axios({
       method: 'POST',
@@ -20,27 +22,30 @@ export const useAccountStore = defineStore('account', () => {
         password
       }
     })
-      .then(res => {
+      .then(async res => {
         token.value = res.data.key
-        username.value = inputUsername
+        // username.value = inputUsername
         localStorage.setItem('token', res.data.key)
-        localStorage.setItem('username', inputUsername)
+
+        const userRes = await axios.get(`${ACCOUNT_API_URL}/user/`,{
+          headers: {
+            Authorization: `Token ${res.data.key}`
+          }
+        })
+        username.value = userRes.data.username
+        localStorage.setItem('username', userRes.data.username)
         router.push({ name: 'home'})
       })
       .catch(err => console.log(err))
   }
 
-  const signUp = ({username, password1, password2, age, email, sub_product}) => {
+  const signUp = (formData) => {
     axios({
       method: 'POST',
       url: `${ACCOUNT_API_URL}/signup/`,
-      data: {
-        username,
-        password1, 
-        password2,
-        age,
-        email,
-        sub_product
+      data: formData,
+      headers: {
+        'Content-Type': 'multipart/form-data',
       }
     })
       .then(res => {
@@ -57,7 +62,39 @@ export const useAccountStore = defineStore('account', () => {
     localStorage.removeItem('username')
   }
 
+  const fetchMyPage = () => {
+    axios({
+      method: 'GET',
+      url: `${ACCOUNT_API_URL}/mypage/`,
+      headers: {
+        Authorization: `Token ${token.value}`
+      }
+    })
+      .then(res => {
+        userInfo.value = res.data
+      })
+      .catch(err => {
+        console.error('마이페이지 불러오기 실패:', err)
+      })
+  }
+
+  const updateMyPage = (formData) => {
+    axios({
+      method: 'POST',
+      url: `${ACCOUNT_API_URL}/mypage/`,
+      data: formData,
+      headers: {
+        Authorization: `Token ${token.value}`
+      }
+    })
+      .then(res => {
+        userInfo.value = res.data
+      })
+      .catch(err => {
+        console.error('마이페이지 수정 실패:', err)
+      })
+    }
   return {
-    logIn, signUp, logOut, token, username, isLogIn
+    logIn, signUp, logOut, token, username, isLogIn, userInfo, fetchMyPage, updateMyPage
   }
 })

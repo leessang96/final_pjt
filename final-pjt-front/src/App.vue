@@ -26,6 +26,7 @@
           </li>
           <li class="nav-item d-flex align-items-center" v-else>
             <span class="nav-link">안녕하세요, {{ accountStore.username }}님</span>
+            <RouterLink :to="{ name: 'myPage'}" class="nav-link">마이페이지</RouterLink>
             <button class="btn btn-link nav-link" @click="handleLogOut">로그아웃</button>
           </li>
         </ul>
