@@ -95,8 +95,8 @@ import os
 load_dotenv()
 API_KEY = os.getenv('API_KEY')
 KAKAO_REST_API_KEY = os.getenv('KAKAO_REST_API_KEY')
-print("카카오 키:", KAKAO_REST_API_KEY)
-print("금감원 키:", API_KEY)
+# print("카카오 키:", KAKAO_REST_API_KEY)
+# print("금감원 키:", API_KEY)
 # ------------------------------------------#
 
 ROOT_URLCONF = 'finpjt.urls'

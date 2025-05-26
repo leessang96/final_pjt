@@ -1,5 +1,24 @@
 <template>
   <h1>은행 지도</h1>
+  <div class="search-form">
+    <select v-model="selectedSido">
+      <option disabled value="">시/도 선택</option>
+      <option v-for="sido in sidoList" :key="sido">{{ sido }}</option>
+    </select>
+
+    <select v-model="selectedSigungu" :disabled="!selectedSido">
+      <option disabled value="">시/군/구 선택</option>
+      <option v-for="sgg in sigunguList" :key="sgg">{{ sgg }}</option>
+    </select>
+
+    <select v-model="selectedBank">
+      <option disabled value="">은행 선택</option>
+      <option v-for="bank in bankList_json" :key="bank">{{ bank }}</option>
+    </select>
+
+    <button @click="searchByRegion">찾기</button>
+  </div>
+
   <div>
     <h2>내 주변 은행 지도</h2>
     <div id="map" style="width: 100%; height: 400px"></div>
@@ -16,10 +35,17 @@
 
 <script setup>
 import axios from 'axios'
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, onMounted, nextTick, watch } from 'vue'
+import json from '@/assets/data.json'
 
 const bankList = ref([])
+let map = null
+const markers = []
 
+function clearMarkers() {
+  markers.forEach(marker => marker.setMap(null))
+  markers.length = 0
+}
 function waitForKakaoMapsReady() {
   return new Promise((resolve) => {
     const check = setInterval(() => {
@@ -40,7 +66,7 @@ async function initializeMap(lat, lng) {
     return
   }
 
-  const map = new window.kakao.maps.Map(container, {
+  map = new window.kakao.maps.Map(container, {
     center: new window.kakao.maps.LatLng(lat, lng),
     level: 4
   })
@@ -96,6 +122,69 @@ onMounted(async () => {
     }
   )
 })
+
+/// 검색 ///
+const sidoList = json.mapInfo.map(region => region.name)
+const sigunguList = ref([])
+const bankList_json = json.bankInfo
+
+const selectedSido = ref('')
+const selectedSigungu = ref('')
+const selectedBank = ref('')
+
+// 시/도 선택 시, 시/군/구 자동 갱신
+watch(selectedSido, (sido) => {
+  const region = json.mapInfo.find(region => region.name === sido)
+  sigunguList.value = region ? region.countries : []
+})
+
+// 검색 버튼 클릭 시 API 호출
+const searchByRegion = async () => {
+  const keyword = `${selectedSido.value} ${selectedSigungu.value} ${selectedBank.value}`
+  const res = await axios.get('https://dapi.kakao.com/v2/local/search/keyword.json', {
+    headers: {
+      Authorization: `KakaoAK ${import.meta.env.VITE_KAKAO_REST_API_KEY}`
+    },
+    params: {
+      query: keyword,
+      category_group_code: 'BK9'
+    }
+  })
+
+    const results = res.data.documents
+  console.log('검색결과:', results)
+
+  if (results.length === 0) {
+    alert('검색 결과가 없습니다')
+    return
+  }
+
+  const first = results[0]
+  const newCenter = new window.kakao.maps.LatLng(first.y, first.x)
+  map.setCenter(newCenter)
+
+  clearMarkers()
+
+  results.forEach(result => {
+    const marker = new window.kakao.maps.Marker({
+      map,
+      position: new window.kakao.maps.LatLng(result.y, result.x),
+      title: result.place_name
+    })
+
+    const info = new window.kakao.maps.InfoWindow({
+      content: `<div style="padding:5px;font-size:14px;">${result.place_name}</div>`
+    })
+
+    window.kakao.maps.event.addListener(marker, 'click', () => {
+      info.open(map, marker)
+    })
+
+    markers.push(marker)
+  })
+}
+
+
 </script>
 
 <style scoped>

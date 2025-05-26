@@ -8,7 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 def search_nearby_banks(request):
     lat = request.GET.get('lat')
     lng = request.GET.get('lng')
-    radius = request.GET.get('radius', '2000')  # 기본 2km
+    radius = request.GET.get('radius', '1000')  # 기본 1km
 
     if not lat or not lng:
         return JsonResponse({'error': 'lat/lng is required'}, status=400)
