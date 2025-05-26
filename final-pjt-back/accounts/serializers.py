@@ -6,6 +6,7 @@ class CustomRegisterSerializer(RegisterSerializer):
     username = serializers.CharField(required=True)
     email = serializers.EmailField(required=True)
     sub_product = serializers.CharField(required=False, allow_blank=True)
+    profile_image = serializers.ImageField(required=False, allow_null=True)
 
     def get_cleaned_data(self):
         data = super().get_cleaned_data()
@@ -13,6 +14,7 @@ class CustomRegisterSerializer(RegisterSerializer):
         data['username'] = self.validated_data.get('username', '')
         data['email'] = self.validated_data.get('email', '')
         data['sub_product'] = self.validated_data.get('sub_product', '')
+        data['profile_image'] = self.validated_data.get('profile_image', None)
         return data
     
 
@@ -22,5 +24,6 @@ class CustomRegisterSerializer(RegisterSerializer):
         user.username = self.validated_data.get('username', '')
         user.email = self.validated_data.get('email', '')
         user.sub_product = self.validated_data.get('sub_product', '')
+        user.profile_image = self.validated_data.get('profile_image', None)
         user.save()
         return user
