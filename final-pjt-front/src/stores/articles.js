@@ -1,13 +1,14 @@
 import { useRouter } from "vue-router";
 import { defineStore } from "pinia";
 import { ref } from 'vue'
+import { useAccountStore } from "./accounts";
 import axios from 'axios'
 
 export const useArticleStore = defineStore('article', () => {
+  const accountStore = useAccountStore()
   const articles = ref([])
   const articleDetail = ref(null)
   const comments = ref([])
-  const token = localStorage.getItem('token')
   const API_URL = 'http://127.0.0.1:8000'
   const router = useRouter()
 
@@ -17,7 +18,7 @@ export const useArticleStore = defineStore('article', () => {
       method: 'get',
       url: `${API_URL}/api/v1/articles/`,
       headers: {
-        Authorization: `Token ${token}`
+        Authorization: `Token ${accountStore.token}`
       }
     })
       .then(res => {
@@ -32,7 +33,7 @@ export const useArticleStore = defineStore('article', () => {
       method: 'get',
       url: `${API_URL}/api/v1/articles/${articleId}/`,
       headers: {
-        Authorization: `Token ${token}`
+        Authorization: `Token ${accountStore.token}`
       }
     })
       .then((res) => {
@@ -47,7 +48,7 @@ export const useArticleStore = defineStore('article', () => {
       method: 'get',
       url: `${API_URL}/api/v1/articles/${articleId}/comments/`,
       headers: {
-        Authorization: `Token ${token}`
+        Authorization: `Token ${accountStore.token}`
       }
     })
       .then((res) => {
@@ -62,7 +63,7 @@ export const useArticleStore = defineStore('article', () => {
       url: `${API_URL}/api/v1/articles/${articleId}/comments/`,
       data: {content},
       headers: {
-        Authorization: `Token ${token}`
+        Authorization: `Token ${accountStore.token}`
       }
     })
       .then((res) => {
@@ -84,7 +85,7 @@ export const useArticleStore = defineStore('article', () => {
         content: newContent
       },
       headers: {
-        Authorization: `Token ${token}`
+        Authorization: `Token ${accountStore.token}`
       }
     })
       .then((res) => {
@@ -100,7 +101,7 @@ export const useArticleStore = defineStore('article', () => {
       method: 'delete',
       url: `${API_URL}/api/v1/articles/comments/${commentId}/`,
       headers: {
-        Authorization: `Token ${token}`
+        Authorization: `Token ${accountStore.token}`
       }
     })
       .then((res) => {
@@ -116,7 +117,7 @@ export const useArticleStore = defineStore('article', () => {
       method: 'POST',
       url: `${API_URL}/api/v1/articles/`,
       headers: {
-        Authorization: `Token ${token}`
+        Authorization: `Token ${accountStore.token}`
       },
       data: {
         title, content
@@ -134,7 +135,7 @@ export const useArticleStore = defineStore('article', () => {
       method: 'put',
       url: `${API_URL}/api/v1/articles/${articleId}/`,
       headers: {
-        Authorization: `Token ${token}`
+        Authorization: `Token ${accountStore.token}`
       },
       data: {
         title, content
@@ -153,7 +154,7 @@ export const useArticleStore = defineStore('article', () => {
       method: 'DELETE',
       url: `${API_URL}/api/v1/articles/${articleId}`,
       headers: {
-        Authorization: `Token ${token}`
+        Authorization: `Token ${accountStore.token}`
       }
     })
       .then(() => {

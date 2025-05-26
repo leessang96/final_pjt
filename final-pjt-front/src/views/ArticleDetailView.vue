@@ -51,7 +51,7 @@ import { useAccountStore } from '@/stores/accounts'
 
 const articleStore = useArticleStore()
 const accountStore = useAccountStore()
-const myUsername = accountStore.username
+const myUsername = computed(() => accountStore.username)
 
 const editingCommentId = ref(null)
 const editedContent = ref('')
