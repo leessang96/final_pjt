@@ -9,6 +9,7 @@ import SignUpView from '@/views/SignUpView.vue'
 import ArticleCreateView from '@/views/ArticleCreateView.vue'
 import ArticleDetailView from '@/views/ArticleDetailView.vue'
 import ArticleUpdateView from '@/views/ArticleUpdateView.vue'
+import MyPageView from '@/views/MyPageView.vue'
 
 
 const router = createRouter({
@@ -63,6 +64,11 @@ const router = createRouter({
       path: '/signUp',
       name: 'signUp',
       component: SignUpView,
+    },
+    {
+      path: '/myPage',
+      name: 'myPage',
+      component: MyPageView,
     },
   ],
 })
