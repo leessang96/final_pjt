@@ -22,11 +22,18 @@ export const useAccountStore = defineStore('account', () => {
         password
       }
     })
-      .then(res => {
+      .then(async res => {
         token.value = res.data.key
-        username.value = inputUsername
+        // username.value = inputUsername
         localStorage.setItem('token', res.data.key)
-        localStorage.setItem('username', inputUsername)
+
+        const userRes = await axios.get(`${ACCOUNT_API_URL}/user/`,{
+          headers: {
+            Authorization: `Token ${res.data.key}`
+          }
+        })
+        username.value = userRes.data.username
+        localStorage.setItem('username', userRes.data.username)
         router.push({ name: 'home'})
       })
       .catch(err => console.log(err))
