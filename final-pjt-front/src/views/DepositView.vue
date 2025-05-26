@@ -96,7 +96,33 @@
   </div>
 </template>
 
+
+
 <script setup>
+// import { useDepositView } from '@/stores/depositview.js'
+
+// const {
+//   // 모달
+//   selectedProduct, showModal, openProductModal, closeModal, joinDenyDetail,
+
+//   // 필터 및 페이지네이션
+//   filterBank, filterTerm,
+//   currentPage, totalPages, nextPage, prevPage,
+
+//   // 데이터 및 정렬
+//   products, filteredProducts, paginatedProducts,
+//   sortTerm, sortDirection, sortByTerm,
+//   getRateByTerm,
+
+//   // API 로딩
+//   loadTerm, loadSaving
+// } = useDepositView()
+
+// import {useProductStore} from '@/stores/depositview'
+
+// const store = useProductStore()
+// store.loadTerm()
+
 import { ref, computed, onMounted, watch } from "vue"
 
 ///////////////모달///////////////
@@ -269,5 +295,6 @@ async function loadSaving() {
 }
 /////////////////////////////////////////////
 </script>
+
 
 <style scoped></style>
