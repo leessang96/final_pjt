@@ -1,24 +1,15 @@
-"""
-URL configuration for protoBack project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
+# fin_products/urls.py
 
 from django.urls import path
-from .views import term_deposits, saving_deposits
+from .views import fetch_and_save_term_deposits, fetch_and_save_saving_deposits, get_term_deposits, get_saving_deposits
+
 
 urlpatterns = [
-    path('term_deposits/', term_deposits),
-    path('saving_deposits/', saving_deposits),
+    # DB 저장용
+    path('fetch/term_deposits/', fetch_and_save_term_deposits),     
+    path('fetch/saving_deposits/', fetch_and_save_saving_deposits), 
+
+    # 프론트 렌더링용
+    path('term_deposits/', get_term_deposits),         
+    path('saving_deposits/', get_saving_deposits),     
 ]

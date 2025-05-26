@@ -1,4 +1,3 @@
-// depositview.js
 import { ref, computed, watch, onMounted } from 'vue'
 
 export function useDepositView() {
