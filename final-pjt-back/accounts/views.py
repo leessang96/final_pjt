@@ -27,3 +27,20 @@ def mypage_view(request):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# 임의로 추가한 내 상품 데이터 함수
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_sub_product(request):
+    product_id = request.data.get('product_id')
+    if not product_id:
+        return Response({"error": "No product ID provided"}, status=400)
+
+    user = request.user
+    if not user.sub_product:
+        user.sub_product = []
+
+    if product_id not in user.sub_product:
+        user.sub_product.append(product_id)
+        user.save()
+    return Response({"message": "Product added"}, status=200)

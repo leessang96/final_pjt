@@ -2,8 +2,10 @@
   <div>
     <div style="display: flex; gap: 0.5rem; align-items: center">
       <h2 @click="loadTerm" style="cursor: pointer">정기예금</h2>
+      <button @click="store.fetchAndStoreTermProducts">정기예금 최신화</button>
       <h2>|</h2>
       <h2 @click="loadSaving" style="cursor: pointer">적금</h2>
+      <button @click="store.fetchAndStoreSavingProducts">적금 최신화</button>
     </div>
 
     <div>
@@ -32,12 +34,12 @@
           <th>공시 제출월</th>
           <th>금융회사 명</th>
           <th>상품 명</th>
-          <th @click="sortByTerm('1')">1개월</th>
-          <th @click="sortByTerm('3')">3개월</th>
-          <th @click="sortByTerm('6')">6개월</th>
-          <th @click="sortByTerm('12')">12개월</th>
-          <th @click="sortByTerm('24')">24개월</th>
-          <th @click="sortByTerm('36')">36개월</th>
+          <th @click="sortByTerm('1')" style="cursor: pointer">1개월</th>
+          <th @click="sortByTerm('3')" style="cursor: pointer">3개월</th>
+          <th @click="sortByTerm('6')" style="cursor: pointer">6개월</th>
+          <th @click="sortByTerm('12')" style="cursor: pointer">12개월</th>
+          <th @click="sortByTerm('24')" style="cursor: pointer">24개월</th>
+          <th @click="sortByTerm('36')" style="cursor: pointer">36개월</th>
         </tr>
       </thead>
       <tbody>
@@ -55,8 +57,6 @@
       </tbody>
     </table>
 
-    <p>모달 상태: {{ showModal }}</p>
-
     <teleport to="body">
       <div v-if="showModal" class="modal">
         <h3>상품 세부 정보</h3>
@@ -68,6 +68,7 @@
         <p style="white-space: pre-line;"><strong>가입 대상:</strong> {{ selectedProduct?.join_member }}</p>
         <p style="white-space: pre-line;"><strong>기타 참고사항:</strong> {{ selectedProduct?.etc_note }}</p>
         <button @click="closeModal">닫기</button>
+        <button @click="addToMyProducts(selectedProduct.fin_prdt_cd)">내 상품에 추가</button>
       </div>
     </teleport>
 
@@ -95,11 +96,21 @@ const {
 const {
   openProductModal, closeModal, joinDenyDetail,
   nextPage, prevPage, sortByTerm, getRateByTerm,
-  loadTerm, loadSaving
+  loadTerm, loadSaving, addToMyProducts,
 } = store
 
-onMounted(() => {
-  loadTerm()
+onMounted(async () => {
+  try {
+    // 1. 데이터 저장 요청 (없으면 생략 가능)
+    await fetch('http://localhost:8000/api/fin-products/fetch/term_deposits/', {
+      method: 'POST'
+    })
+
+    // 2. 저장 후 렌더링용 데이터 요청
+    await loadTerm()
+  } catch (err) {
+    console.error('예금 데이터 저장 또는 로딩 실패:', err)
+  }
 })
 </script>
 

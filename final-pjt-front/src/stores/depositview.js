@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed, watch } from 'vue'
+import axios from 'axios'
+import { useAccountStore } from '@/stores/accounts'
 
 export const useDepositView = defineStore('depositView', () => {
   const selectedProduct = ref(null)
@@ -15,6 +17,26 @@ export const useDepositView = defineStore('depositView', () => {
     selectedProduct.value = null
     showModal.value = false
   }
+
+  async function addToMyProducts(productId) {
+  try {
+    const accountStore = useAccountStore()
+    const headers = accountStore.token
+      ? { Authorization: `Token ${accountStore.token}` }
+      : {}
+
+    await axios.post(
+      'http://localhost:8000/api/v1/accounts/add-product/',
+      { product_id: productId },
+      { headers }
+    )
+    alert('내 상품에 추가되었습니다!')
+  } catch (err) {
+    console.error('[ERROR] 상품 추가 실패:', err)
+    alert('추가 실패: 로그인 상태를 확인하세요')
+    }
+  }
+
 
   function joinDenyDetail(code) {
     switch (code) {
@@ -73,11 +95,13 @@ export const useDepositView = defineStore('depositView', () => {
       sortDirection.value = 'asc'
     }
 
+    console.time('sort')
     products.value.sort((a, b) => {
-      const aRate = parseFloat(a.optionList.find(o => o.save_trm === term)?.intr_rate ?? -1)
-      const bRate = parseFloat(b.optionList.find(o => o.save_trm === term)?.intr_rate ?? -1)
+      const aRate = a.rateMap?.[term] ?? -1
+      const bRate = b.rateMap?.[term] ?? -1
       return sortDirection.value === 'asc' ? aRate - bRate : bRate - aRate
     })
+    console.timeEnd('sort')
 
     currentPage.value = 1
   }
@@ -86,7 +110,10 @@ export const useDepositView = defineStore('depositView', () => {
     try {
       const res = await fetch('http://localhost:8000/api/fin-products/term_deposits/')
       const data = await res.json()
-      products.value = data.result
+      products.value = data.result.map(p => ({
+      ...p,
+      rateMap: Object.fromEntries(p.optionList.map(o => [o.save_trm, o.intr_rate]))
+      }))
       currentPage.value = 1
     } catch (err) {
       console.error('정기예금 API 호출 실패:', err)
@@ -94,13 +121,41 @@ export const useDepositView = defineStore('depositView', () => {
   }
 
   async function loadSaving() {
+      try {
+
+        const res = await fetch('http://localhost:8000/api/fin-products/saving_deposits/')
+        const data = await res.json()
+        products.value = data.result.map(p => ({
+          ...p,
+          rateMap: Object.fromEntries(p.optionList.map(o => [o.save_trm, o.intr_rate]))
+        }))
+        currentPage.value = 1
+      } catch (err) {
+        console.error('적금 API 호출 실패:', err)
+      }
+  }
+
+  async function fetchAndStoreTermProducts() {
     try {
-      const res = await fetch('http://localhost:8000/api/fin-products/saving_deposits/')
+      const res = await fetch('http://localhost:8000/api/fin-products/fetch/term_deposits/', {
+        method: 'POST'
+      })
       const data = await res.json()
-      products.value = data.result
-      currentPage.value = 1
+      console.log('[DEBUG] 정기예금 저장 완료:', data)
     } catch (err) {
-      console.error('적금 API 호출 실패:', err)
+      console.error('[ERROR] 정기예금 저장 실패:', err)
+    }
+  }
+
+  async function fetchAndStoreSavingProducts() {
+    try {
+      const res = await fetch('http://localhost:8000/api/fin-products/fetch/saving_deposits/', {
+        method: 'POST'
+      })
+      const data = await res.json()
+      console.log('[DEBUG] 적금 저장 완료:', data)
+    } catch (err) {
+      console.error('[ERROR] 적금 저장 실패:', err)
     }
   }
 
@@ -117,6 +172,8 @@ export const useDepositView = defineStore('depositView', () => {
     sortTerm, sortDirection,
     nextPage, prevPage,
     getRateByTerm, sortByTerm,
-    loadTerm, loadSaving
+    loadTerm, loadSaving,
+    fetchAndStoreTermProducts, fetchAndStoreSavingProducts,
+    addToMyProducts,
   }
 })
