@@ -150,16 +150,35 @@ const bankingType = ref('')
 const preferredBanks = ref('')
 const recommendedProducts = ref([])
 
-const isTermView = ref(true)  // 예금이면 true, 적금이면 false
+const isTermView = ref(true)
 
 const getRecommendations = async () => {
   const productType = isTermView.value ? 'term' : 'saving'
 
+  const minRateVal = parseFloat(minRate.value)
+  const minTermVal = parseInt(minTerm.value)
+  const maxTermVal = parseInt(maxTerm.value)
+
+  if (isNaN(minRateVal) || isNaN(minTermVal) || isNaN(maxTermVal)) {
+    alert('모든 필드를 올바르게 입력해주세요.')
+    return
+  }
+
+  if (minRateVal < 0) {
+    alert('최소 이자율은 0 이상이어야 합니다.')
+    return
+  }
+
+  if (minTermVal > maxTermVal) {
+    alert('예치 최소 기간은 최대 기간보다 작거나 같아야 합니다.')
+    return
+  }
+
   const params = new URLSearchParams({
     product_type: productType,
-    min_rate: minRate.value,
-    min_term: minTerm.value,
-    max_term: maxTerm.value,
+    min_rate: minRateVal,
+    min_term: minTermVal,
+    max_term: maxTermVal,
     banking_type: bankingType.value,
     preferred_banks: preferredBanks.value
   })
@@ -180,38 +199,22 @@ const getRecommendations = async () => {
   recommendedProducts.value = await res.json()
 }
 
+// 상품 옵션 중 조건에 맞는 것 찾기
 const getMatchedOption = (product) => {
-  const min = minTerm.value
-  const max = maxTerm.value
-  const minRateVal = minRate.value
+  const min = parseInt(minTerm.value)
+  const max = parseInt(maxTerm.value)
+  const rate = parseFloat(minRate.value)
 
-  return product.optionList.find(opt => {
-    const term = parseInt(opt.save_trm)
-    return (
-      term >= min &&
-      term <= max &&
-      opt.intr_rate >= minRateVal
-    )
-  }) || product.optionList[0]  // 조건 만족하는 게 없으면 첫 번째 옵션 fallback
+  const matched = product.optionList
+    .filter(opt => {
+      const term = parseInt(opt.save_trm)
+      return term >= min && term <= max && opt.intr_rate >= rate
+    })
+    .sort((a, b) => b.intr_rate - a.intr_rate)  // 높은 금리 우선 정렬
+
+  return matched[0] || product.optionList[0]
 }
 
-
-// const getRecommendations = async () => {
-//   const productType = isTermView.value ? 'term' : 'saving'
-
-//   const params = new URLSearchParams({
-//     product_type: productType,
-//     min_rate: minRate.value,
-//     min_term: minTerm.value,
-//     max_term: maxTerm.value,
-//     banking_type: bankingType.value,
-//     preferred_banks: preferredBanks.value
-//   })
-
-//   const res = await fetch(`http://localhost:8000/api/fin-products/recommend/product-based/?${params}`)
-//   recommendedProducts.value = await res.json()
-// }
-//////////////
 
 const store = useDepositView()
 
