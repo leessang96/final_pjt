@@ -13,7 +13,7 @@ import requests
 
 
 ### [1] 정기예금 저장용 API 호출 후 DB 저장 ###
-@api_view(['POST'])
+@api_view(['GET', 'POST'])
 def fetch_and_save_term_deposits(request):
     url = "https://finlife.fss.or.kr/finlifeapi/depositProductsSearch.json"
     fin_groups = ["020000", "030300"]
@@ -75,7 +75,7 @@ def fetch_and_save_term_deposits(request):
 
 
 ### [2] 적금 저장용 ###
-@api_view(['POST'])
+@api_view(['GET', 'POST'])
 def fetch_and_save_saving_deposits(request):
     url = "https://finlife.fss.or.kr/finlifeapi/savingProductsSearch.json"
     fin_groups = ["020000", "030300"]

@@ -1,10 +1,12 @@
-import { ref, computed, watch, onMounted } from 'vue'
+import { defineStore } from 'pinia'
+import { ref, computed, watch } from 'vue'
 
-export function useDepositView() {
+export const useDepositView = defineStore('depositView', () => {
   const selectedProduct = ref(null)
   const showModal = ref(false)
 
   function openProductModal(product) {
+    console.log('[DEBUG] 모달 열기:', product)
     selectedProduct.value = product
     showModal.value = true
   }
@@ -102,8 +104,7 @@ export function useDepositView() {
     }
   }
 
-  onMounted(loadTerm)
-
+  // watch를 여기 둘 수 있음
   watch([filterBank, filterTerm], () => {
     currentPage.value = 1
   })
@@ -118,4 +119,4 @@ export function useDepositView() {
     getRateByTerm, sortByTerm,
     loadTerm, loadSaving
   }
-}
+})
