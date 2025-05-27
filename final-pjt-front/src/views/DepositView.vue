@@ -43,7 +43,8 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="product in paginatedProducts" :key="product.fin_prdt_cd + '-' + product.fin_co_no" @click="openProductModal(product)" style="cursor: pointer">
+        <tr v-for="product in paginatedProducts" :key="product.fin_prdt_cd + '-' + product.fin_co_no"
+          @click="openProductModal(product)" style="cursor: pointer">
           <td>{{ product.dcls_month }}</td>
           <td>{{ product.kor_co_nm }}</td>
           <td>{{ product.fin_prdt_nm }}</td>
@@ -60,7 +61,8 @@
     <teleport to="body">
       <div v-if="showModal" class="modal">
         <h3>상품 세부 정보</h3>
-        <p><strong>이자 지급 방식:</strong> {{ selectedProduct?.optionList.find(o => o.save_trm === '1')?.intr_rate_type_nm || '복리' }}</p>
+        <p><strong>이자 지급 방식:</strong> {{selectedProduct?.optionList.find(o => o.save_trm === '1')?.intr_rate_type_nm ||
+          '복리' }}</p>
         <p style="white-space: pre-line;"><strong>가입 방법:</strong> {{ selectedProduct?.join_way }}</p>
         <p style="white-space: pre-line;"><strong>만기 후 이자율:</strong> {{ selectedProduct?.mtrt_int }}</p>
         <p style="white-space: pre-line;"><strong>우대 조건:</strong> {{ selectedProduct?.spcl_cnd }}</p>
@@ -69,7 +71,7 @@
         <p style="white-space: pre-line;"><strong>기타 참고사항:</strong> {{ selectedProduct?.etc_note }}</p>
         <button @click="closeModal">닫기</button>
         <!-- <button @click="addToMyProducts(selectedProduct.fin_prdt_cd, isTermView ? 'term' : 'saving')">내 상품에 추가</button> -->
-         <button @click="handleAddToMyProducts">내 상품에 추가</button>
+        <button @click="handleAddToMyProducts">내 상품에 추가</button>
       </div>
     </teleport>
 
@@ -88,7 +90,7 @@
     </label>
     <label>
       예치 기간:
-      <input type="number" v-model.number="minTerm"> ~ 
+      <input type="number" v-model.number="minTerm"> ~
       <input type="number" v-model.number="maxTerm"> 개월
     </label>
     <label>
@@ -151,16 +153,35 @@ const bankingType = ref('')
 const preferredBanks = ref('')
 const recommendedProducts = ref([])
 
-const isTermView = ref(true)  // 예금이면 true, 적금이면 false
+const isTermView = ref(true)
 
 const getRecommendations = async () => {
   const productType = isTermView.value ? 'term' : 'saving'
 
+  const minRateVal = parseFloat(minRate.value)
+  const minTermVal = parseInt(minTerm.value)
+  const maxTermVal = parseInt(maxTerm.value)
+
+  if (isNaN(minRateVal) || isNaN(minTermVal) || isNaN(maxTermVal)) {
+    alert('모든 필드를 올바르게 입력해주세요.')
+    return
+  }
+
+  if (minRateVal < 0) {
+    alert('최소 이자율은 0 이상이어야 합니다.')
+    return
+  }
+
+  if (minTermVal > maxTermVal) {
+    alert('예치 최소 기간은 최대 기간보다 작거나 같아야 합니다.')
+    return
+  }
+
   const params = new URLSearchParams({
     product_type: productType,
-    min_rate: minRate.value,
-    min_term: minTerm.value,
-    max_term: maxTerm.value,
+    min_rate: minRateVal,
+    min_term: minTermVal,
+    max_term: maxTermVal,
     banking_type: bankingType.value,
     preferred_banks: preferredBanks.value
   })
@@ -187,38 +208,22 @@ const handleAddToMyProducts = () => {
   addToMyProducts(productId, productType)
 }
 
+// 상품 옵션 중 조건에 맞는 것 찾기
 const getMatchedOption = (product) => {
-  const min = minTerm.value
-  const max = maxTerm.value
-  const minRateVal = minRate.value
+  const min = parseInt(minTerm.value)
+  const max = parseInt(maxTerm.value)
+  const rate = parseFloat(minRate.value)
 
-  return product.optionList.find(opt => {
-    const term = parseInt(opt.save_trm)
-    return (
-      term >= min &&
-      term <= max &&
-      opt.intr_rate >= minRateVal
-    )
-  }) || product.optionList[0]  // 조건 만족하는 게 없으면 첫 번째 옵션 fallback
+  const matched = product.optionList
+    .filter(opt => {
+      const term = parseInt(opt.save_trm)
+      return term >= min && term <= max && opt.intr_rate >= rate
+    })
+    .sort((a, b) => b.intr_rate - a.intr_rate)  // 높은 금리 우선 정렬
+
+  return matched[0] || product.optionList[0]
 }
 
-
-// const getRecommendations = async () => {
-//   const productType = isTermView.value ? 'term' : 'saving'
-
-//   const params = new URLSearchParams({
-//     product_type: productType,
-//     min_rate: minRate.value,
-//     min_term: minTerm.value,
-//     max_term: maxTerm.value,
-//     banking_type: bankingType.value,
-//     preferred_banks: preferredBanks.value
-//   })
-
-//   const res = await fetch(`http://localhost:8000/api/fin-products/recommend/product-based/?${params}`)
-//   recommendedProducts.value = await res.json()
-// }
-//////////////
 
 const store = useDepositView()
 
@@ -264,5 +269,4 @@ onMounted(async () => {
   display: block !important;
   box-shadow: 0 0 20px black !important;
 }
-
 </style>
