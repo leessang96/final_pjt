@@ -37,10 +37,13 @@
   </div>
 
   <!-- 댓글 작성 폼 -->
-  <form @submit.prevent="submitComment">
+  <form v-if="accountStore.isLogIn" @submit.prevent="submitComment">
     <textarea v-model="newComment" rows="3" placeholder="댓글을 입력하세요" required></textarea>
     <button class="btn btn-primary">댓글 작성</button>
   </form>
+
+  <!-- 로그인 안 한 경우 안내 -->
+   <p v-else class="text-muted">댓글을 작성하려면 로그인이 필요합니다.</p>
 </template>
 
 <script setup>

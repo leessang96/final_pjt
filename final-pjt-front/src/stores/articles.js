@@ -14,12 +14,11 @@ export const useArticleStore = defineStore('article', () => {
 
   // 게시글 전체 리스트
   const getArticles = () => {
+    const headers = accountStore.token ? { Authorization: `Token ${accountStore.token}`} : {}
     axios({
       method: 'get',
       url: `${API_URL}/api/v1/articles/`,
-      headers: {
-        Authorization: `Token ${accountStore.token}`
-      }
+      headers
     })
       .then(res => {
         articles.value = res.data
@@ -29,12 +28,11 @@ export const useArticleStore = defineStore('article', () => {
 
   // 게시글 디테일 get
   const getArticleDetail = (articleId) => {
+    const headers = accountStore.token ? { Authorization: `Token ${accountStore.token}`} : {}
     axios({
       method: 'get',
       url: `${API_URL}/api/v1/articles/${articleId}/`,
-      headers: {
-        Authorization: `Token ${accountStore.token}`
-      }
+      headers
     })
       .then((res) => {
         articleDetail.value = { ...res.data }
@@ -44,12 +42,12 @@ export const useArticleStore = defineStore('article', () => {
 
   
   const getComments = (articleId) => {
+    const headers = accountStore.token ? { Authorization: `Token ${accountStore.token}`} : {}
+
     axios({
       method: 'get',
       url: `${API_URL}/api/v1/articles/${articleId}/comments/`,
-      headers: {
-        Authorization: `Token ${accountStore.token}`
-      }
+      headers
     })
       .then((res) => {
         comments.value = res.data

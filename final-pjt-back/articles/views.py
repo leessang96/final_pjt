@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
 
 # Permissions
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
 
 from django.shortcuts import get_object_or_404, get_list_or_404
 
@@ -13,7 +13,7 @@ from .models import Article, Comment
 
 # Create your views here.
 @api_view(['GET', 'POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def article_list(request):
     if request.method == 'GET':
         articles = get_list_or_404(Article)
@@ -48,7 +48,7 @@ def article_detail(request, article_pk):
 
 
 @api_view(['GET', 'POST'])
-@permission_classes([IsAuthenticatedOrReadOnly])
+@permission_classes([AllowAny])
 def comment_list_create(request, article_pk):
     try:
         article = Article.objects.get(pk=article_pk)
