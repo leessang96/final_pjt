@@ -1,5 +1,8 @@
 import requests
 import re
+import operator
+from functools import reduce
+from django.db.models import Q
 from django.conf import settings
 from django.http import JsonResponse
 from rest_framework.decorators import api_view, permission_classes
@@ -162,7 +165,6 @@ def is_age_eligible(join_member, user_age):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-# @permission_classes([AllowAny])
 def product_based_recommendation(request):
     user = request.user
     user_age = user.age or 0
@@ -181,19 +183,67 @@ def product_based_recommendation(request):
         Model = InstallmentSaving
         Serializer = InstallmentSavingSerializer
 
+    # 기본 필터링 (rate + join_way 포함)
     queryset = Model.objects.filter(
         optionList__intr_rate__gte=min_rate,
-        optionList__save_trm__gte=min_term,
-        optionList__save_trm__lte=max_term,
         join_way__icontains=banking_type,
-        kor_co_nm__in=preferred_banks
     ).distinct()
 
-    filtered = [
-        p for p in queryset if is_age_eligible(p.join_member, user_age)
-    ][:5]
+    # 선호 은행명 부분 일치 처리
+    if preferred_banks and preferred_banks != ['']:
+        queryset = queryset.filter(
+            reduce(operator.or_, [
+                Q(kor_co_nm__icontains=bank.strip()) for bank in preferred_banks
+            ])
+        )
+
+    # 최종 필터링 (나이 + 예치기간 범위)
+    filtered = sorted(
+        [
+            p for p in queryset
+            if is_age_eligible(p.join_member, user_age)
+            and is_term_in_range(p, min_term, max_term)
+            and get_max_rate_in_term(p, min_term, max_term, min_rate) >= min_rate
+        ],
+        key=lambda p: get_max_rate_in_term(p, min_term, max_term, min_rate),
+        reverse=True
+    )[:5]
 
     return Response(Serializer(filtered, many=True).data)
+
+
+def is_age_eligible(join_member, user_age):
+    numbers = list(map(int, re.findall(r'\d+', join_member or '')))
+    if not numbers:
+        return True
+    elif len(numbers) == 1:
+        return user_age >= numbers[0]
+    elif len(numbers) >= 2:
+        return numbers[0] <= user_age <= numbers[1]
+    return True
+
+def is_term_in_range(product, min_term, max_term):
+    for opt in product.optionList.all():
+        try:
+            term = int(opt.save_trm)
+            if min_term <= term <= max_term:
+                return True
+        except ValueError:
+            continue
+    return False
+
+def get_max_rate_in_term(product, min_term, max_term, min_rate):
+    valid_rates = []
+    for opt in product.optionList.all():
+        try:
+            term = int(opt.save_trm)
+            if min_term <= term <= max_term and opt.intr_rate >= min_rate:
+                valid_rates.append(opt.intr_rate)
+        except (ValueError, TypeError):
+            continue
+    return max(valid_rates or [0])
+
+
 
 # from django.shortcuts import render
 # from django.http import JsonResponse

@@ -123,8 +123,8 @@
           <td>{{ p.kor_co_nm }}</td>
           <td>{{ p.fin_prdt_nm }}</td>
           <td>{{ p.optionList[0]?.intr_rate_type_nm }}</td>
-          <td>{{ p.optionList[0]?.save_trm }}개월</td>
-          <td>{{ p.optionList[0]?.intr_rate }}%</td>
+          <td>{{ getMatchedOption(p)?.save_trm }}개월</td>
+          <td>{{ getMatchedOption(p)?.intr_rate }}%</td>
         </tr>
       </tbody>
     </table>
@@ -143,11 +143,11 @@ const accountStore = useAccountStore()
 ///// 추천 /////
 import { ref } from 'vue'
 
-const minRate = ref(2.0)
-const minTerm = ref(6)
-const maxTerm = ref(24)
+const minRate = ref('')
+const minTerm = ref('')
+const maxTerm = ref('')
 const bankingType = ref('')
-const preferredBanks = ref('신한은행,국민은행')
+const preferredBanks = ref('')
 const recommendedProducts = ref([])
 
 const isTermView = ref(true)  // 예금이면 true, 적금이면 false
@@ -179,6 +179,22 @@ const getRecommendations = async () => {
 
   recommendedProducts.value = await res.json()
 }
+
+const getMatchedOption = (product) => {
+  const min = minTerm.value
+  const max = maxTerm.value
+  const minRateVal = minRate.value
+
+  return product.optionList.find(opt => {
+    const term = parseInt(opt.save_trm)
+    return (
+      term >= min &&
+      term <= max &&
+      opt.intr_rate >= minRateVal
+    )
+  }) || product.optionList[0]  // 조건 만족하는 게 없으면 첫 번째 옵션 fallback
+}
+
 
 // const getRecommendations = async () => {
 //   const productType = isTermView.value ? 'term' : 'saving'
