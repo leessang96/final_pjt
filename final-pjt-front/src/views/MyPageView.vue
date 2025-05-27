@@ -21,13 +21,13 @@
       <li>
         <span class="label">Nickname</span>
         <span v-if="!editing.nickname" class="value">{{ store.userInfo.nickname }}</span>
-        <input v-else v-model="form.nickname" type="text" />
+          <input v-else v-model="form.nickname" type="text" />
         <button @click="editField('nickname')" class="edit-btn">수정하기</button>
       </li>
       <li>
         <span class="label">나이</span>
         <span v-if="!editing.age" class="value">{{ store.userInfo.age }}</span>
-        <input v-else v-model="form.age" type="number" />
+          <input v-else v-model="form.age" type="number" />
         <button @click="editField('age')" class="edit-btn">수정하기</button>
       </li>
       <li>
@@ -35,7 +35,7 @@
         <span v-if="!editing.current_amount" class="value">
           {{ typeof form.current_amount === 'number' ? form.current_amount.toLocaleString() : '금액 없음' }}
         </span>
-        <input v-else v-model="form.current_amount" type="number" />
+          <input v-else v-model="form.current_amount" type="number" />
         <button @click="editField('current_amount')" class="edit-btn">수정하기</button>
       </li>
       <li>
@@ -43,7 +43,7 @@
         <span v-if="!editing.salary" class="value">
           {{ typeof form.salary === 'number' ? form.salary.toLocaleString() : '연봉 없음'}}
         </span>
-        <input v-else v-model="form.salary" type="number" />
+          <input v-else v-model="form.salary" type="number" />
         <button @click="editField('salary')" class="edit-btn">수정하기</button>
       </li>
     </ul>
@@ -111,7 +111,52 @@ const submitForm = async () => {
 }
 </script>
 
-<style scoped>
+<style>
+
+input, select, textarea {
+  width: 100%;
+  padding: 0.6rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ccc;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+button {
+  background-color: #FFD700;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #e6c200;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
 .mypage-container {
   max-width: 700px;
   margin: 0 auto;

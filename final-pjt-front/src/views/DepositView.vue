@@ -8,24 +8,22 @@
       <button @click="store.fetchAndStoreSavingProducts">적금 최신화</button>
     </div>
 
-    <div>
-      <label>
-        금융회사명:
-        <input type="text" v-model="filterBank" placeholder="금융회사 명을 적으세요">
-      </label>
+    <div class="form-group">
+      <label>금융회사명:</label>
+      <input type="text" v-model="filterBank" placeholder="금융회사 명을 적으세요" />
+    </div>
 
-      <label>
-        예치기간:
-        <select v-model="filterTerm">
-          <option value="">전체</option>
-          <option value="1">1개월</option>
-          <option value="3">3개월</option>
-          <option value="6">6개월</option>
-          <option value="12">12개월</option>
-          <option value="24">24개월</option>
-          <option value="36">36개월</option>
-        </select>
-      </label>
+    <div class="form-group">
+      <label>예치기간:</label>
+      <select v-model="filterTerm">
+        <option value="">전체</option>
+        <option value="1">1개월</option>
+        <option value="3">3개월</option>
+        <option value="6">6개월</option>
+        <option value="12">12개월</option>
+        <option value="24">24개월</option>
+        <option value="36">36개월</option>
+      </select>
     </div>
 
     <table v-if="paginatedProducts.length" border="1" style="width: 100%">
@@ -61,8 +59,7 @@
     <teleport to="body">
       <div v-if="showModal" class="modal">
         <h3>상품 세부 정보</h3>
-        <p><strong>이자 지급 방식:</strong> {{selectedProduct?.optionList.find(o => o.save_trm === '1')?.intr_rate_type_nm ||
-          '복리' }}</p>
+        <p><strong>이자 지급 방식:</strong> {{ selectedProduct?.optionList.find(o => o.save_trm === '1')?.intr_rate_type_nm || '복리' }}</p>
         <p style="white-space: pre-line;"><strong>가입 방법:</strong> {{ selectedProduct?.join_way }}</p>
         <p style="white-space: pre-line;"><strong>만기 후 이자율:</strong> {{ selectedProduct?.mtrt_int }}</p>
         <p style="white-space: pre-line;"><strong>우대 조건:</strong> {{ selectedProduct?.spcl_cnd }}</p>
@@ -70,7 +67,6 @@
         <p style="white-space: pre-line;"><strong>가입 대상:</strong> {{ selectedProduct?.join_member }}</p>
         <p style="white-space: pre-line;"><strong>기타 참고사항:</strong> {{ selectedProduct?.etc_note }}</p>
         <button @click="closeModal">닫기</button>
-        <!-- <button @click="addToMyProducts(selectedProduct.fin_prdt_cd, isTermView ? 'term' : 'saving')">내 상품에 추가</button> -->
         <button @click="handleAddToMyProducts">내 상품에 추가</button>
       </div>
     </teleport>
@@ -80,60 +76,65 @@
       <span>페이지 {{ currentPage }} / {{ totalPages }}</span>
       <button @click="nextPage" :disabled="currentPage === totalPages">다음</button>
     </div>
+
+    <div style="margin-top: 2rem">
+      <h3>추천 조건</h3>
+
+      <div class="form-group">
+        <label>최소 이자율:</label>
+        <input type="number" v-model.number="minRate" />
+      </div>
+
+      <div class="form-group">
+        <label>예치 기간:</label>
+        <div style="display: flex; gap: 0.5rem; align-items: center">
+          <input type="number" v-model.number="minTerm" /> ~
+          <input type="number" v-model.number="maxTerm" /> 개월
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>뱅킹 방식:</label>
+        <select v-model="bankingType">
+          <option value="">전체</option>
+          <option>인터넷</option>
+          <option>모바일</option>
+          <option>창구</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>선호 은행 (콤마 구분):</label>
+        <input type="text" v-model="preferredBanks" />
+      </div>
+
+      <button @click="getRecommendations">추천 상품 보기</button>
+    </div>
+
+    <div v-if="recommendedProducts.length" style="margin-top: 1rem">
+      <h4>추천 상품 목록</h4>
+      <table border="1" style="width: 100%">
+        <thead>
+          <tr>
+            <th>금융회사</th>
+            <th>상품명</th>
+            <th>이자 유형</th>
+            <th>기간</th>
+            <th>금리</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="p in recommendedProducts" :key="p.fin_prdt_cd">
+            <td>{{ p.kor_co_nm }}</td>
+            <td>{{ p.fin_prdt_nm }}</td>
+            <td>{{ p.optionList[0]?.intr_rate_type_nm }}</td>
+            <td>{{ getMatchedOption(p)?.save_trm }}개월</td>
+            <td>{{ getMatchedOption(p)?.intr_rate }}%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
-
-  <div style="margin-top: 2rem">
-    <h3>추천 조건</h3>
-    <label>
-      최소 이자율:
-      <input type="number" v-model.number="minRate">
-    </label>
-    <label>
-      예치 기간:
-      <input type="number" v-model.number="minTerm"> ~
-      <input type="number" v-model.number="maxTerm"> 개월
-    </label>
-    <label>
-      뱅킹 방식:
-      <select v-model="bankingType">
-        <option value="">전체</option>
-        <option>인터넷</option>
-        <option>모바일</option>
-        <option>창구</option>
-      </select>
-    </label>
-    <label>
-      선호 은행 (콤마 구분):
-      <input type="text" v-model="preferredBanks">
-    </label>
-    <button @click="getRecommendations">추천 상품 보기</button>
-  </div>
-
-  <div v-if="recommendedProducts.length" style="margin-top: 1rem">
-    <h4>추천 상품 목록</h4>
-    <table border="1" style="width: 100%">
-      <thead>
-        <tr>
-          <th>금융회사</th>
-          <th>상품명</th>
-          <th>이자 유형</th>
-          <th>기간</th>
-          <th>금리</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="p in recommendedProducts" :key="p.fin_prdt_cd">
-          <td>{{ p.kor_co_nm }}</td>
-          <td>{{ p.fin_prdt_nm }}</td>
-          <td>{{ p.optionList[0]?.intr_rate_type_nm }}</td>
-          <td>{{ getMatchedOption(p)?.save_trm }}개월</td>
-          <td>{{ getMatchedOption(p)?.intr_rate }}%</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-
 </template>
 
 <script setup>
@@ -269,4 +270,52 @@ onMounted(async () => {
   display: block !important;
   box-shadow: 0 0 20px black !important;
 }
+</style>
+
+<style>
+
+input, select, textarea {
+  width: 100%;
+  padding: 0.6rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ccc;
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}
+
+button {
+  background-color: #FFD700;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 0.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #e6c200;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
 </style>

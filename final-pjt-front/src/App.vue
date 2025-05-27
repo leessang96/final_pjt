@@ -1,9 +1,8 @@
-<template>
 
-  <!-- 네비게이션 -->
-  <nav class="navbar navbar-expand-lg bg-body-tertiary">
+<template>
+  <nav class="navbar navbar-expand-lg bg-light border-bottom">
     <div class="container-fluid">
-      <a class="navbar-brand" href="/">Navbar</a>
+      <a class="navbar-brand text-warning fw-bold" href="/">ban(k)pick</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
         aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -39,7 +38,7 @@
   </nav>
 
   <main>
-    <div class="container">
+    <div class="container py-4">
       <RouterView />
     </div>
   </main>
@@ -47,7 +46,6 @@
 
 <script setup>
 import { RouterLink, RouterView, useRouter } from 'vue-router'
-import { ref, computed, onMounted } from 'vue'
 import { useAccountStore } from '@/stores/accounts.js'
 
 const accountStore = useAccountStore()
@@ -57,7 +55,19 @@ const handleLogOut = () => {
   accountStore.logOut()
   router.push({ name: 'home' })
 }
-
 </script>
 
-<style scoped></style>
+<style scoped>
+.navbar {
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.nav-link {
+  color: #333;
+  font-weight: 500;
+}
+
+.nav-link:hover {
+  color: #FFD700;
+}
+</style>
