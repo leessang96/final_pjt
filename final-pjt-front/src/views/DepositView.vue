@@ -79,12 +79,123 @@
     </div>
   </div>
 
+  <div style="margin-top: 2rem">
+    <h3>추천 조건</h3>
+    <label>
+      최소 이자율:
+      <input type="number" v-model.number="minRate">
+    </label>
+    <label>
+      예치 기간:
+      <input type="number" v-model.number="minTerm"> ~ 
+      <input type="number" v-model.number="maxTerm"> 개월
+    </label>
+    <label>
+      뱅킹 방식:
+      <select v-model="bankingType">
+        <option value="">전체</option>
+        <option>인터넷</option>
+        <option>모바일</option>
+        <option>창구</option>
+      </select>
+    </label>
+    <label>
+      선호 은행 (콤마 구분):
+      <input type="text" v-model="preferredBanks">
+    </label>
+    <button @click="getRecommendations">추천 상품 보기</button>
+  </div>
+
+  <div v-if="recommendedProducts.length" style="margin-top: 1rem">
+    <h4>추천 상품 목록</h4>
+    <table border="1" style="width: 100%">
+      <thead>
+        <tr>
+          <th>금융회사</th>
+          <th>상품명</th>
+          <th>이자 유형</th>
+          <th>기간</th>
+          <th>금리</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="p in recommendedProducts" :key="p.fin_prdt_cd">
+          <td>{{ p.kor_co_nm }}</td>
+          <td>{{ p.fin_prdt_nm }}</td>
+          <td>{{ p.optionList[0]?.intr_rate_type_nm }}</td>
+          <td>{{ p.optionList[0]?.save_trm }}개월</td>
+          <td>{{ p.optionList[0]?.intr_rate }}%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
 </template>
 
 <script setup>
 import { onMounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDepositView } from '@/stores/depositview'
+import { useAccountStore } from '@/stores/accounts'
+const accountStore = useAccountStore()
+
+///// 추천 /////
+import { ref } from 'vue'
+
+const minRate = ref(2.0)
+const minTerm = ref(6)
+const maxTerm = ref(24)
+const bankingType = ref('')
+const preferredBanks = ref('신한은행,국민은행')
+const recommendedProducts = ref([])
+
+const isTermView = ref(true)  // 예금이면 true, 적금이면 false
+
+const getRecommendations = async () => {
+  const productType = isTermView.value ? 'term' : 'saving'
+
+  const params = new URLSearchParams({
+    product_type: productType,
+    min_rate: minRate.value,
+    min_term: minTerm.value,
+    max_term: maxTerm.value,
+    banking_type: bankingType.value,
+    preferred_banks: preferredBanks.value
+  })
+
+  const headers = {
+    Authorization: `Token ${accountStore.token}`
+  }
+
+  const res = await fetch(`http://localhost:8000/api/fin-products/recommend/product-based/?${params}`, {
+    headers
+  })
+
+  if (!res.ok) {
+    console.error('추천 API 오류:', res.status)
+    return
+  }
+
+  recommendedProducts.value = await res.json()
+}
+
+// const getRecommendations = async () => {
+//   const productType = isTermView.value ? 'term' : 'saving'
+
+//   const params = new URLSearchParams({
+//     product_type: productType,
+//     min_rate: minRate.value,
+//     min_term: minTerm.value,
+//     max_term: maxTerm.value,
+//     banking_type: bankingType.value,
+//     preferred_banks: preferredBanks.value
+//   })
+
+//   const res = await fetch(`http://localhost:8000/api/fin-products/recommend/product-based/?${params}`)
+//   recommendedProducts.value = await res.json()
+// }
+//////////////
 
 const store = useDepositView()
 

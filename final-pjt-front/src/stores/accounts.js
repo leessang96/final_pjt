@@ -20,7 +20,7 @@ export const useAccountStore = defineStore('account', () => {
   const logIn = ({username: inputUsername, password}) => {
     axios({
       method: 'POST',
-      url: `${ACCOUNT_API_URL}/login/`,
+      url: `${AUTH_API_URL}/login/`,
       data: {
         username: inputUsername, 
         password
@@ -47,7 +47,7 @@ export const useAccountStore = defineStore('account', () => {
   const signUp = (formData) => {
     axios({
       method: 'POST',
-      url: `${ACCOUNT_API_URL}/signup/`,
+      url: `${AUTH_API_URL}/signup/`,
       data: formData,
       headers: {
         'Content-Type': 'multipart/form-data',

@@ -1,15 +1,15 @@
-# fin_products/views.py
-
+import requests
+import re
 from django.conf import settings
 from django.http import JsonResponse
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from .models import (
     TermDeposit, TermDepositOption,
-    InstallmentSaving, InstallmentSavingOption
+    InstallmentSaving, InstallmentSavingOption,
 )
 from .serializers import TermDepositSerializer, InstallmentSavingSerializer
-import requests
 
 
 ### [1] 정기예금 저장용 API 호출 후 DB 저장 ###
@@ -150,6 +150,50 @@ def get_saving_deposits(request):
     serializer = InstallmentSavingSerializer(savings, many=True)
     return Response({'result': serializer.data})
 
+def is_age_eligible(join_member, user_age):
+    numbers = list(map(int, re.findall(r'\d+', join_member or '')))
+    if not numbers:
+        return True
+    elif len(numbers) == 1:
+        return user_age >= numbers[0]
+    elif len(numbers) >= 2:
+        return numbers[0] <= user_age <= numbers[1]
+    return True
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+# @permission_classes([AllowAny])
+def product_based_recommendation(request):
+    user = request.user
+    user_age = user.age or 0
+
+    product_type = request.GET.get('product_type')  # 'term' or 'saving'
+    min_rate = float(request.GET.get('min_rate', 0))
+    min_term = int(request.GET.get('min_term', 1))
+    max_term = int(request.GET.get('max_term', 36))
+    banking_type = request.GET.get('banking_type', '')
+    preferred_banks = request.GET.get('preferred_banks', '').split(',')
+
+    if product_type == 'term':
+        Model = TermDeposit
+        Serializer = TermDepositSerializer
+    else:
+        Model = InstallmentSaving
+        Serializer = InstallmentSavingSerializer
+
+    queryset = Model.objects.filter(
+        optionList__intr_rate__gte=min_rate,
+        optionList__save_trm__gte=min_term,
+        optionList__save_trm__lte=max_term,
+        join_way__icontains=banking_type,
+        kor_co_nm__in=preferred_banks
+    ).distinct()
+
+    filtered = [
+        p for p in queryset if is_age_eligible(p.join_member, user_age)
+    ][:5]
+
+    return Response(Serializer(filtered, many=True).data)
 
 # from django.shortcuts import render
 # from django.http import JsonResponse
