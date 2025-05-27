@@ -18,22 +18,28 @@ export const useDepositView = defineStore('depositView', () => {
     showModal.value = false
   }
 
-  async function addToMyProducts(productId) {
-  try {
-    const accountStore = useAccountStore()
-    const headers = accountStore.token
-      ? { Authorization: `Token ${accountStore.token}` }
-      : {}
+  async function addToMyProducts(productId, productType) {
+    try {
+      console.log(productId)
+      console.log(productType)
+      const accountStore = useAccountStore()
+      const headers = accountStore.token
+        ? { Authorization: `Token ${accountStore.token}` }
+        : {}
 
-    await axios.post(
-      'http://localhost:8000/api/v1/accounts/add-product/',
-      { product_id: productId },
-      { headers }
-    )
-    alert('내 상품에 추가되었습니다!')
-  } catch (err) {
-    console.error('[ERROR] 상품 추가 실패:', err)
-    alert('추가 실패: 로그인 상태를 확인하세요')
+      await axios.post(
+        'http://localhost:8000/api/v1/accounts/add-product/',
+        {
+          product_id: productId,
+          product_type: productType
+        },
+        { headers }
+      )
+
+      alert('내 상품에 추가되었습니다!')
+    } catch (err) {
+      console.error('[ERROR] 상품 추가 실패:', err)
+      alert('추가 실패: 로그인 상태를 확인하세요')
     }
   }
 
@@ -111,8 +117,8 @@ export const useDepositView = defineStore('depositView', () => {
       const res = await fetch('http://localhost:8000/api/fin-products/term_deposits/')
       const data = await res.json()
       products.value = data.result.map(p => ({
-      ...p,
-      rateMap: Object.fromEntries(p.optionList.map(o => [o.save_trm, o.intr_rate]))
+        ...p,
+        rateMap: Object.fromEntries(p.optionList.map(o => [o.save_trm, o.intr_rate]))
       }))
       currentPage.value = 1
     } catch (err) {
@@ -121,18 +127,18 @@ export const useDepositView = defineStore('depositView', () => {
   }
 
   async function loadSaving() {
-      try {
+    try {
 
-        const res = await fetch('http://localhost:8000/api/fin-products/saving_deposits/')
-        const data = await res.json()
-        products.value = data.result.map(p => ({
-          ...p,
-          rateMap: Object.fromEntries(p.optionList.map(o => [o.save_trm, o.intr_rate]))
-        }))
-        currentPage.value = 1
-      } catch (err) {
-        console.error('적금 API 호출 실패:', err)
-      }
+      const res = await fetch('http://localhost:8000/api/fin-products/saving_deposits/')
+      const data = await res.json()
+      products.value = data.result.map(p => ({
+        ...p,
+        rateMap: Object.fromEntries(p.optionList.map(o => [o.save_trm, o.intr_rate]))
+      }))
+      currentPage.value = 1
+    } catch (err) {
+      console.error('적금 API 호출 실패:', err)
+    }
   }
 
   async function fetchAndStoreTermProducts() {

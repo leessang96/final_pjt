@@ -1,6 +1,9 @@
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from rest_framework import serializers
 from .models import User
+from fin_products.models import TermDeposit, InstallmentSaving
+from fin_products.serializers import TermDepositSerializer, InstallmentSavingSerializer
+
 
 class CustomRegisterSerializer(RegisterSerializer):
     nickname = serializers.CharField(required=True)
@@ -37,7 +40,23 @@ class CustomRegisterSerializer(RegisterSerializer):
         return user
 
 
+class SimpleTermDepositSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TermDeposit
+        fields = ['fin_prdt_cd', 'fin_prdt_nm']  # 필요한 필드만 선택
+
+
+class SimpleInstallmentSavingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InstallmentSaving
+        fields = ['fin_prdt_cd', 'fin_prdt_nm']  # 필요한 필드만 선택
+
+
 class UserInfoSerializer(serializers.ModelSerializer):
+    
+    joined_term_products = TermDepositSerializer(many=True, read_only=True)
+    joined_saving_products = InstallmentSavingSerializer(many=True, read_only=True)
+
     class Meta:
         model = User
         fields = [
@@ -49,6 +68,8 @@ class UserInfoSerializer(serializers.ModelSerializer):
             'salary',
             'current_amount',
             'profile_image',
+            'joined_term_products',
+            'joined_saving_products',
         ]
         read_only_fields = ['id', 'username']
 

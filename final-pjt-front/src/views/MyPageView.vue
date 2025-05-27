@@ -49,6 +49,12 @@
     </ul>
 
     <button @click="submitForm" class="submit-btn">모든 변경사항 저장</button>
+
+    <UserProductChart
+      v-if="store.userInfo"
+      :term-products="store.userInfo.joined_term_products"
+      :saving-products="store.userInfo.joined_saving_products"
+    />
   </div>
 
   <div v-else>
@@ -59,6 +65,7 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useAccountStore } from '@/stores/accounts'
+import UserProductChart from '@/components/UserProductChart.vue'
 
 const store = useAccountStore()
 

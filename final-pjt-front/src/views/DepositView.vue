@@ -1,10 +1,10 @@
 <template>
   <div>
     <div style="display: flex; gap: 0.5rem; align-items: center">
-      <h2 @click="loadTerm" style="cursor: pointer">정기예금</h2>
+      <h2 @click="() => { isTermView = true; loadTerm() }" style="cursor: pointer">정기예금</h2>
       <button @click="store.fetchAndStoreTermProducts">정기예금 최신화</button>
       <h2>|</h2>
-      <h2 @click="loadSaving" style="cursor: pointer">적금</h2>
+      <h2 @click="() => { isTermView = false; loadSaving() }" style="cursor: pointer">적금</h2>
       <button @click="store.fetchAndStoreSavingProducts">적금 최신화</button>
     </div>
 
@@ -68,7 +68,8 @@
         <p style="white-space: pre-line;"><strong>가입 대상:</strong> {{ selectedProduct?.join_member }}</p>
         <p style="white-space: pre-line;"><strong>기타 참고사항:</strong> {{ selectedProduct?.etc_note }}</p>
         <button @click="closeModal">닫기</button>
-        <button @click="addToMyProducts(selectedProduct.fin_prdt_cd)">내 상품에 추가</button>
+        <!-- <button @click="addToMyProducts(selectedProduct.fin_prdt_cd, isTermView ? 'term' : 'saving')">내 상품에 추가</button> -->
+         <button @click="handleAddToMyProducts">내 상품에 추가</button>
       </div>
     </teleport>
 
@@ -178,6 +179,12 @@ const getRecommendations = async () => {
   }
 
   recommendedProducts.value = await res.json()
+}
+
+const handleAddToMyProducts = () => {
+  const productId = selectedProduct.value.fin_prdt_cd
+  const productType = isTermView.value ? 'term' : 'saving'
+  addToMyProducts(productId, productType)
 }
 
 const getMatchedOption = (product) => {
