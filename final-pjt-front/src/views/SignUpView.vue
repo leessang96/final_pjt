@@ -33,10 +33,6 @@
     <input type="number" id="current_amount" class="mb-3 ms-2" placeholder="현재 자산 입력" v-model="current_amount" required />
     <br />
 
-    <label for="sub-product">Sub Product:</label>
-    <input type="text" id="sub-product" class="mb-3 ms-2" placeholder="가입한 상품 목록" v-model="sub_product" />
-    <br />
-
     <label for="profile_image">Profile Image:</label>
     <input type="file" id="profile_image" class="mb-3 ms-2" @change="onFileChange" />
     <br />
@@ -59,7 +55,6 @@ const age = ref('')
 const email = ref('')
 const salary = ref('')
 const current_amount = ref('')
-const sub_product = ref('')
 const profile_image = ref(null)
 
 const onFileChange = (event) => {
@@ -79,7 +74,6 @@ const onSignUp = () => {
   formData.append('email', email.value)
   formData.append('salary', salary.value)
   formData.append('current_amount', current_amount.value)
-  formData.append('sub_product', sub_product.value)
 
   if (profile_image.value) {
     formData.append('profile_image', profile_image.value)
