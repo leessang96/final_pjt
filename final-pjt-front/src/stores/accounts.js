@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router';
 import axios from 'axios';
 
 export const useAccountStore = defineStore('account', () => {
-  const ACCOUNT_API_URL = 'http://127.0.0.1:8000/accounts'
+  // const ACCOUNT_API_URL = 'http://127.0.0.1:8000/api/v1/accounts'
   const token = ref(localStorage.getItem('token'))
   const username = ref(localStorage.getItem('username') || '')
   const router = useRouter()
@@ -12,6 +12,10 @@ export const useAccountStore = defineStore('account', () => {
   const isLogIn = computed(() => !!token.value)
 
   const userInfo = ref(null)  
+
+  const BASE_URL = 'http://127.0.0.1:8000'
+  const ACCOUNT_API_URL = `${BASE_URL}/api/v1/accounts`
+  const AUTH_API_URL = `${BASE_URL}/accounts`
 
   const logIn = ({username: inputUsername, password}) => {
     axios({
@@ -27,7 +31,8 @@ export const useAccountStore = defineStore('account', () => {
         // username.value = inputUsername
         localStorage.setItem('token', res.data.key)
 
-        const userRes = await axios.get(`${ACCOUNT_API_URL}/user/`,{
+        // const userRes = await axios.get(`${ACCOUNT_API_URL}/user/`,{
+        const userRes = await axios.get(`${AUTH_API_URL}/user/`, {
           headers: {
             Authorization: `Token ${res.data.key}`
           }

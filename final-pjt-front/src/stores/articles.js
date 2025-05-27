@@ -15,6 +15,7 @@ export const useArticleStore = defineStore('article', () => {
   // 게시글 전체 리스트
   const getArticles = () => {
     const headers = accountStore.token ? { Authorization: `Token ${accountStore.token}`} : {}
+    console.log(accountStore.token)
     axios({
       method: 'get',
       url: `${API_URL}/api/v1/articles/`,
