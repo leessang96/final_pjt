@@ -10,6 +10,8 @@ import ArticleCreateView from '@/views/ArticleCreateView.vue'
 import ArticleDetailView from '@/views/ArticleDetailView.vue'
 import ArticleUpdateView from '@/views/ArticleUpdateView.vue'
 import MyPageView from '@/views/MyPageView.vue'
+import VideoSearchView from '@/views/VideoSearchView.vue'
+import VideoDetailView from '@/views/VideoDetailView.vue'
 
 
 const router = createRouter({
@@ -69,6 +71,16 @@ const router = createRouter({
       path: '/myPage',
       name: 'myPage',
       component: MyPageView,
+    },
+    {
+      path: '/searchVideo',
+      name: 'searchVideo',
+      component: VideoSearchView,
+    },
+    {
+      path: '/videoDetail/:id',
+      name: 'videoDetail',
+      component: VideoDetailView,
     },
   ],
 })
