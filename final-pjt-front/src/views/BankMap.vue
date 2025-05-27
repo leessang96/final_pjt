@@ -43,7 +43,10 @@ let map = null
 const markers = []
 
 function clearMarkers() {
-  markers.forEach(marker => marker.setMap(null))
+  markers.forEach(markerObj => {
+    markerObj.marker.setMap(null)
+    markerObj.info.close()
+  })
   markers.length = 0
 }
 function waitForKakaoMapsReady() {
@@ -61,10 +64,7 @@ async function initializeMap(lat, lng) {
   await nextTick()
 
   const container = document.getElementById('map')
-  if (!container) {
-    console.error('map 컨테이너가 없습니다')
-    return
-  }
+  if (!container) return
 
   map = new window.kakao.maps.Map(container, {
     center: new window.kakao.maps.LatLng(lat, lng),
@@ -81,26 +81,33 @@ async function initializeMap(lat, lng) {
     params: { lat, lng }
   })
 
-  console.log('지도 API 응답', res.data)
-
   bankList.value = res.data.documents
 
+  clearMarkers() // 새로 추가
+
   bankList.value.forEach(bank => {
-    const marker = new window.kakao.maps.Marker({
-      map,
-      position: new window.kakao.maps.LatLng(bank.y, bank.x),
-      title: bank.place_name
-    })
+    const position = new window.kakao.maps.LatLng(bank.y, bank.x)
+    const marker = new window.kakao.maps.Marker({ map, position, title: bank.place_name })
 
     const info = new window.kakao.maps.InfoWindow({
       content: `<div style="padding:5px;font-size:14px;">${bank.place_name}</div>`
     })
 
+    let isOpen = false
     window.kakao.maps.event.addListener(marker, 'click', () => {
-      info.open(map, marker)
+      if (isOpen) {
+        info.close()
+        isOpen = false
+      } else {
+        info.open(map, marker)
+        isOpen = true
+      }
     })
+
+    markers.push({ marker, info })
   })
 }
+
 
 onMounted(async () => {
   navigator.geolocation.getCurrentPosition(
@@ -160,27 +167,30 @@ const searchByRegion = async () => {
   }
 
   const first = results[0]
-  const newCenter = new window.kakao.maps.LatLng(first.y, first.x)
-  map.setCenter(newCenter)
+  map.setCenter(new window.kakao.maps.LatLng(first.y, first.x))
 
   clearMarkers()
 
   results.forEach(result => {
-    const marker = new window.kakao.maps.Marker({
-      map,
-      position: new window.kakao.maps.LatLng(result.y, result.x),
-      title: result.place_name
-    })
+    const position = new window.kakao.maps.LatLng(result.y, result.x)
+    const marker = new window.kakao.maps.Marker({ map, position, title: result.place_name })
 
     const info = new window.kakao.maps.InfoWindow({
       content: `<div style="padding:5px;font-size:14px;">${result.place_name}</div>`
     })
 
+    let isOpen = false
     window.kakao.maps.event.addListener(marker, 'click', () => {
-      info.open(map, marker)
+      if (isOpen) {
+        info.close()
+        isOpen = false
+      } else {
+        info.open(map, marker)
+        isOpen = true
+      }
     })
 
-    markers.push(marker)
+    markers.push({ marker, info })
   })
 }
 
